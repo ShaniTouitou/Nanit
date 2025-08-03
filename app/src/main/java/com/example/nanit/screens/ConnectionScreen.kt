@@ -25,6 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nanit.ui.theme.BentonSans
 
+// region Constant Members
+
+const val CONNECT_TITLE = "Connect to Nanit Server"
+
+const val DISPLAY_TEXT_IP = "IP Address"
+
+const val DISPLAY_TEXT_PORT = "Port"
+
+const val BTN_TEXT_CONNECT = "Connect"
+
+// endregion
+
 /**
  * This is the server connection screen.
  */
@@ -51,7 +63,7 @@ fun ConnectScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Connect to Nanit Server",
+            text = CONNECT_TITLE,
             fontSize = 25.sp,
             fontFamily = BentonSans
         )
@@ -61,7 +73,7 @@ fun ConnectScreen(
         OutlinedTextField(
             value = ip,
             onValueChange = { ip = it },
-            label = { Text("IP Address") },
+            label = { Text(DISPLAY_TEXT_IP) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -71,7 +83,7 @@ fun ConnectScreen(
         OutlinedTextField(
             value = port,
             onValueChange = { port = it },
-            label = { Text("Port") },
+            label = { Text(DISPLAY_TEXT_PORT) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
@@ -84,7 +96,7 @@ fun ConnectScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Connect",
+                text = BTN_TEXT_CONNECT,
                 fontSize = 15.sp,
                 fontFamily = BentonSans
             )

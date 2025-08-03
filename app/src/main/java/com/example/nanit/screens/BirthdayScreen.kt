@@ -1,5 +1,6 @@
 package com.example.nanit.screens
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
@@ -12,17 +13,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,11 +34,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberAsyncImagePainter
 import com.example.nanit.R
 import com.example.nanit.model.getNumberIconRes
@@ -53,43 +58,54 @@ import com.example.nanit.viewmodel.BirthdayViewModel
  * This is the birthday screen.
  */
 
+// region Constant Members
+
+const val DISPLAY_TEXT_TODAY = "TODAY"
+
+const val DISPLAY_TEXT_IS = "IS"
+
+const val DISPLAY_TEXT_MONTH_OLD = "MONTH OLD!"
+
+const val DISPLAY_TEXT_YEAR_OLD = "YEARS OLD!"
+
+const val DIALOG_TEXT_SELECT_OPTION = "Select Option"
+
+const val DIALOG_TEXT_CHOICE = "Choose how to update the baby face image"
+
+const val DIALOG_TEXT_CHOOSE_PICTURE = "Take Picture"
+
+const val DIALOG_TEXT_CHOOSE_GALLERY = "Choose from Gallery"
+
+// endregion
+
 // region UI
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun BirthdayScreen(state: BirthdayState,
-                   onConnect: () -> Unit,
-                   viewModel: BirthdayViewModel) {
-
+fun BirthdayScreen(
+    state: BirthdayState,
+    onConnect: () -> Unit,
+    viewModel: BirthdayViewModel
+) {
     // region Members
 
     val context = LocalContext.current
 
     var showDialog by remember { mutableStateOf(false) }
-
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launcher to pick image from gallery
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            viewModel.updateBabyFace(it)
-        }
+        uri?.let { viewModel.updateBabyFace(it) }
     }
 
-    // Launcher to take photo with camera
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            cameraImageUri?.let { uri ->
-                viewModel.updateBabyFace(uri)
-            }
-        }
+        if (success) cameraImageUri?.let { viewModel.updateBabyFace(it) }
     }
 
-    // endregion
-
-    // region Public Methods
-
-    // Create a temporary file URI for camera
+    /**
+     * Creates a temporary image file URI for saving a captured photo.
+     */
     fun createImageUri(context: Context): Uri? {
         val resolver = context.contentResolver
         val contentValues = ContentValues().apply {
@@ -107,18 +123,12 @@ fun BirthdayScreen(state: BirthdayState,
         return
     }
 
-    // region Members
+    // region UI Content
 
     state.birthdayData?.let { data ->
         val assets = state.themeAssets ?: return
-
         val ageMonths = calculateAgeInMonths(data.dob)
-
-        val isBabyLessThanOneYear = ageMonths < 12
-
-        val displayText = if (isBabyLessThanOneYear) "MONTH OLD!" else "YEARS OLD!"
-
-        // endregion
+        val displayText = if (ageMonths < 12) DISPLAY_TEXT_MONTH_OLD else DISPLAY_TEXT_YEAR_OLD
 
         Box(
             modifier = Modifier
@@ -127,111 +137,137 @@ fun BirthdayScreen(state: BirthdayState,
         ) {
             assets.backgroundImg()
 
-            Column(
+            ConstraintLayout(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
             ) {
+                val (title, swirlsRow, ageLabel, babyBox, logo) = createRefs()
+
                 Text(
-                    text = "TODAY ${data.name.uppercase()} IS",
+                    text = DISPLAY_TEXT_TODAY + {data.name.uppercase()} + DISPLAY_TEXT_IS,
                     fontSize = 21.sp,
                     color = TextColor,
                     fontFamily = BentonSans,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.constrainAs(title) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                 )
 
-                Spacer(Modifier.height(8.dp))
-
-                // Swirls + Number centered
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.constrainAs(swirlsRow) {
+                        top.linkTo(title.bottom, margin = 13.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.left_swirls_ic),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(id = getNumberIconRes(ageMonths)),
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Image(
-                        painter = painterResource(R.drawable.right_swirls_ic),
-                        contentDescription = null
-                    )
+                    Image(painter = painterResource(R.drawable.left_swirls_ic), contentDescription = null)
+                    Spacer(Modifier.width(22.dp))
+                    Image(painter = painterResource(id = getNumberIconRes(ageMonths)), contentDescription = null)
+                    Spacer(Modifier.width(22.dp))
+                    Image(painter = painterResource(R.drawable.right_swirls_ic), contentDescription = null)
                 }
-
-                Spacer(Modifier.height(8.dp))
 
                 Text(
                     text = displayText,
                     fontSize = 18.sp,
                     color = TextColor,
                     fontFamily = BentonSans,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.constrainAs(ageLabel) {
+                        top.linkTo(swirlsRow.bottom, margin = 14.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                 )
 
-                Spacer(Modifier.height(24.dp))
+                val babyFaceSizeDp = 200.dp
 
-                // Baby face image
-                Box(contentAlignment = Alignment.TopEnd) {
-                    if (viewModel.babyFaceUri.value != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(viewModel.babyFaceUri.value),
-                            contentDescription = "Baby face",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clickable { showDialog = true }
-                        )
-                    }
-                    else {
-                        Image(
-                            painter = painterResource(id = assets.babyFaceImg),
-                            contentDescription = "Baby face",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clickable { showDialog = true }
-                        )
-                    }
+                Box(
+                    modifier = Modifier
+                        .constrainAs(babyBox) {
+                            top.linkTo(ageLabel.bottom, margin = 15.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(horizontal = 50.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val painter = viewModel.babyFaceUri.value?.let {
+                        rememberAsyncImagePainter(it)
+                    } ?: painterResource(id = assets.babyFaceImg)
+
+                    var measuredBabyFaceSize by remember { mutableStateOf(IntSize.Zero) }
+                    val density = LocalDensity.current
 
                     Image(
-                        painter = painterResource(id = assets.camImg),
-                        contentDescription = null,
+                        painter = painter,
+                        contentDescription = "Baby face",
                         modifier = Modifier
-                            .size(24.dp)
-                            .offset(x = (-8).dp, y = 8.dp)
+                            .size(babyFaceSizeDp)
                             .clickable { showDialog = true }
+                            .onGloballyPositioned { coordinates ->
+                                measuredBabyFaceSize = coordinates.size
+                            }
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
-                }
 
-                Spacer(Modifier.height(24.dp))
+                    if (measuredBabyFaceSize != IntSize.Zero) {
+                        val offsetDp = with(density) {
+                            (measuredBabyFaceSize.width / 2f * 0.707f).toDp()
+                        }
+
+                        Image(
+                            painter = painterResource(id = assets.camImg),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .offset(x = offsetDp, y = -offsetDp)
+                                .clickable { showDialog = true }
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = assets.camImg),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .offset(x = 35.dp, y = (-35).dp)
+                                .clickable { showDialog = true }
+                        )
+                    }
+                }
 
                 Image(
                     painter = painterResource(R.drawable.nanit_ic),
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.constrainAs(logo) {
+                        top.linkTo(babyBox.bottom, margin = 15.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                 )
             }
         }
     } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(onClick = onConnect) {
-            Text("Connect")
+            Text(BTN_TEXT_CONNECT)
         }
     }
 
-    // Dialog for choosing option for baby face
+    // region Dialog
+
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Select Option") },
-            text = { Text("Choose how to update the baby face image") },
+            title = { Text(DIALOG_TEXT_SELECT_OPTION) },
+            text = { Text(DIALOG_TEXT_CHOICE) },
             confirmButton = {
                 TextButton(onClick = {
-                    // Take picture option
                     showDialog = false
                     val uri = createImageUri(context)
                     if (uri != null) {
@@ -239,25 +275,20 @@ fun BirthdayScreen(state: BirthdayState,
                         cameraLauncher.launch(uri)
                     }
                 }) {
-                    Text("Take Picture")
+                    Text(DIALOG_TEXT_CHOOSE_PICTURE)
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
-                    // Choose from gallery option
                     showDialog = false
                     galleryLauncher.launch("image/*")
                 }) {
-                    Text("Choose from Gallery")
+                    Text(DIALOG_TEXT_CHOOSE_GALLERY)
                 }
             }
         )
     }
+    // endregion
 }
 
 // endregion
-
-
-
-
-
