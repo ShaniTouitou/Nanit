@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -169,6 +171,7 @@ fun BirthdayScreen(
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             maxLines = Int.MAX_VALUE,
+                            letterSpacing = (-0.42).sp,
                             softWrap = true,
                             modifier = Modifier.width(textWidth)
                         )
@@ -187,10 +190,14 @@ fun BirthdayScreen(
                             end.linkTo(parent.end)
                         }
                 ) {
-                    Image(painter = painterResource(R.drawable.left_swirls_ic), contentDescription = null)
+                    Image(painter = painterResource( R.drawable.left_swirls_ic), contentDescription = null)
+
                     Spacer(Modifier.width(22.dp))
+
                     Image(painter = painterResource(id = getNumberIconRes(ageMonths)), contentDescription = null)
+
                     Spacer(Modifier.width(22.dp))
+
                     Image(painter = painterResource(R.drawable.right_swirls_ic), contentDescription = null)
                 }
 
@@ -200,6 +207,7 @@ fun BirthdayScreen(
                     color = TextColor,
                     fontFamily = BentonSans,
                     fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.36).sp,
                     modifier = Modifier.constrainAs(ageLabel) {
                         top.linkTo(swirlsRow.bottom, margin = 14.dp)
                         start.linkTo(parent.start)
@@ -207,7 +215,7 @@ fun BirthdayScreen(
                     }
                 )
 
-                val babyFaceSizeDp = 200.dp
+                val babyFaceSizeDp = 220.dp
 
                 Box(
                     modifier = Modifier
@@ -219,49 +227,44 @@ fun BirthdayScreen(
                         .padding(horizontal = 50.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    val painter = viewModel.babyFaceUri.value?.let {
-                        rememberAsyncImagePainter(it)
-                    } ?: painterResource(id = assets.babyFaceImg)
+                    val customImageUri = viewModel.babyFaceUri.value
+                    val isCustomImage = customImageUri != null
+                    val customImagePainter = customImageUri?.let { rememberAsyncImagePainter(it) }
 
-                    var measuredBabyFaceSize by remember { mutableStateOf(IntSize.Zero) }
+                    val innerFaceSizeDp = babyFaceSizeDp - 10.dp
                     val density = LocalDensity.current
+                    val offsetDp = with(density) {
+                        val radiusPx = babyFaceSizeDp.toPx() / 2f
+                        val offsetPx = radiusPx * 0.707f
+                        offsetPx.toDp()
+                    }
 
                     Image(
-                        painter = painter,
-                        contentDescription = "Baby face",
+                        painter = painterResource(id = assets.themeFaceImg),
+                        contentDescription = "Themed baby face background",
                         modifier = Modifier
                             .size(babyFaceSizeDp)
-                            .clickable { showDialog = true }
-                            .onGloballyPositioned { coordinates ->
-                                measuredBabyFaceSize = coordinates.size
-                            }
-                            .clip(CircleShape),
+                            .clip(CircleShape)
+                    )
+
+                    Image(
+                        painter = customImagePainter ?: painterResource(id = assets.babyFaceImg),
+                        contentDescription = if (isCustomImage) "User baby face" else "Default baby face",
+                        modifier = Modifier
+                            .size(innerFaceSizeDp)
+                            .clip(CircleShape)
+                            .clickable { showDialog = true },
                         contentScale = ContentScale.Crop
                     )
 
-                    if (measuredBabyFaceSize != IntSize.Zero) {
-                        val offsetDp = with(density) {
-                            (measuredBabyFaceSize.width / 2f * 0.707f).toDp()
-                        }
-
-                        Image(
-                            painter = painterResource(id = assets.camImg),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .offset(x = offsetDp, y = -offsetDp)
-                                .clickable { showDialog = true }
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = assets.camImg),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .offset(x = 35.dp, y = (-35).dp)
-                                .clickable { showDialog = true }
-                        )
-                    }
+                    Image(
+                        painter = painterResource(id = assets.camImg),
+                        contentDescription = "Camera icon",
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .offset(x = offsetDp, y = -offsetDp)
+                            .clickable { showDialog = true }
+                    )
                 }
 
                 Image(

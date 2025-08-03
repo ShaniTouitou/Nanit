@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 data class ThemeData(
     val backgroundColor: Color,
     val backgroundImg: @Composable () -> Unit,
+    val themeFaceImg: Int,
     val babyFaceImg: Int,
     val camImg: Int
 )

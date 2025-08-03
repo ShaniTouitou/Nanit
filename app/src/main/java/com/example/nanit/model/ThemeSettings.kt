@@ -17,19 +17,22 @@ val themeMap = mapOf(
     "fox" to ThemeData(
         backgroundColor = Fox,
         backgroundImg = { foxBackground(modifier = Modifier.fillMaxSize()) },
-        babyFaceImg = R.drawable.fox_baby_circle_ic,
+        themeFaceImg = R.drawable.fox_baby_circle_ic,
+        babyFaceImg = R.drawable.fox_baby_part_circle_ic,
         camImg = R.drawable.fox_camera_ic
     ),
     "elephant" to ThemeData(
         backgroundColor = Elephant,
         backgroundImg = { elephantBackground(modifier = Modifier.fillMaxSize()) },
-        babyFaceImg = R.drawable.elephant_baby_circle_ic,
+        themeFaceImg = R.drawable.elephant_baby_circle_ic,
+        babyFaceImg = R.drawable.elephant_baby_part_circle_ic,
         camImg = R.drawable.elephant_camera_ic
     ),
     "pelican" to ThemeData(
         backgroundColor = Pelican,
         backgroundImg = { pelicanBackground(modifier = Modifier.fillMaxSize()) },
-        babyFaceImg = R.drawable.pelican_baby_circle_ic,
+        themeFaceImg = R.drawable.pelican_baby_circle_ic,
+        babyFaceImg = R.drawable.pelican_baby_part_circle_ic,
         camImg = R.drawable.pelican_camera_ic
     )
 )
