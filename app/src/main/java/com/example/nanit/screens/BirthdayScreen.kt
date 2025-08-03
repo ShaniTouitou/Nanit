@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -125,6 +126,10 @@ fun BirthdayScreen(
 
     // region UI Content
 
+    var swirlsWidth by remember { mutableStateOf(0) }
+
+    val density = LocalDensity.current
+
     state.birthdayData?.let { data ->
         val assets = state.themeAssets ?: return
         val ageMonths = calculateAgeInMonths(data.dob)
@@ -144,26 +149,43 @@ fun BirthdayScreen(
             ) {
                 val (title, swirlsRow, ageLabel, babyBox, logo) = createRefs()
 
-                Text(
-                    text = DISPLAY_TEXT_TODAY + {data.name.uppercase()} + DISPLAY_TEXT_IS,
-                    fontSize = 21.sp,
-                    color = TextColor,
-                    fontFamily = BentonSans,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.constrainAs(title) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                Box(
+                    modifier = Modifier
+                        .constrainAs(title) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (swirlsWidth > 0) {
+                        val textWidth = with(density) { swirlsWidth.toDp() }
+
+                        Text(
+                            text = "$DISPLAY_TEXT_TODAY ${data.name.uppercase()} $DISPLAY_TEXT_IS",
+                            fontSize = 21.sp,
+                            color = TextColor,
+                            fontFamily = BentonSans,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            maxLines = Int.MAX_VALUE,
+                            softWrap = true,
+                            modifier = Modifier.width(textWidth)
+                        )
                     }
-                )
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.constrainAs(swirlsRow) {
-                        top.linkTo(title.bottom, margin = 13.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
+                    modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            swirlsWidth = coordinates.size.width
+                        }
+                        .constrainAs(swirlsRow) {
+                            top.linkTo(title.bottom, margin = 13.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
                 ) {
                     Image(painter = painterResource(R.drawable.left_swirls_ic), contentDescription = null)
                     Spacer(Modifier.width(22.dp))
