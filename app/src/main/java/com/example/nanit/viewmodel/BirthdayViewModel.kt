@@ -1,6 +1,8 @@
 package com.example.nanit.viewmodel
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nanit.model.themeMap
@@ -24,6 +26,8 @@ class BirthdayViewModel @Inject constructor(private val repository: BirthdayRepo
     // region Members
     private val _state = MutableStateFlow(BirthdayState())
     val state: StateFlow<BirthdayState> = _state.asStateFlow()
+
+    val babyFaceUri = mutableStateOf<Uri?>(null)
 
     // endregion
 
@@ -55,6 +59,11 @@ class BirthdayViewModel @Inject constructor(private val repository: BirthdayRepo
             }
             else -> {}
         }
+    }
+
+    // Update the baby face image with a chosen image.
+    fun updateBabyFace(uri: Uri) {
+        babyFaceUri.value = uri
     }
 
     // endregion

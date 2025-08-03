@@ -30,7 +30,7 @@ fun AppNavigation(viewModel: BirthdayViewModel) {
         }
 
         composable(NavRoutes.Birthday.route) {
-            BirthdayScreen(state = state.value) { }
+            BirthdayScreen(state = state.value, onConnect = {}, viewModel)
         }
     }
 
