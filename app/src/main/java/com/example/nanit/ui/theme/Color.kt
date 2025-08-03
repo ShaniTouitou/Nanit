@@ -10,6 +10,8 @@ val Elephant = Color(0xFFFEEFCB)
 
 val Pelican = Color(0xFFDAF1F6)
 
+val TextColor = Color(0xFF394562)
+
 /// endregion
 
 val Purple80 = Color(0xFFD0BCFF)

@@ -1,5 +1,6 @@
 package com.example.nanit.model
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -7,7 +8,7 @@ import androidx.compose.ui.graphics.Color
  */
 data class ThemeData(
     val backgroundColor: Color,
-    val backgroundImg: Int,
+    val backgroundImg: @Composable () -> Unit,
     val babyFaceImg: Int,
     val camImg: Int
 )
