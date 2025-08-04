@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -144,7 +145,7 @@ fun BirthdayScreen(
 
             BoxWithConstraints {
                 val screenHeight = maxHeight
-                val dynamicTopPadding = screenHeight * 0.15f
+                val dynamicTopPadding = screenHeight * 0.08f
 
                 ConstraintLayout(
                     modifier = Modifier
@@ -158,32 +159,23 @@ fun BirthdayScreen(
                 ) {
                     val (title, swirlsRow, ageLabel, babyBox, logo) = createRefs()
 
-                    Box(
+                    Text(
+                        text = "$DISPLAY_TEXT_TODAY ${data.name.uppercase()} $DISPLAY_TEXT_IS",
+                        fontSize = 21.sp,
+                        color = TextColor,
+                        fontFamily = BentonSans,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        letterSpacing = (-0.42).sp,
+                        softWrap = true,
                         modifier = Modifier
                             .constrainAs(title) {
                                 top.linkTo(parent.top)
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (swirlsWidth > 0) {
-                            val textWidth = with(density) { swirlsWidth.toDp() }
-
-                            Text(
-                                text = "$DISPLAY_TEXT_TODAY ${data.name.uppercase()} $DISPLAY_TEXT_IS",
-                                fontSize = 21.sp,
-                                color = TextColor,
-                                fontFamily = BentonSans,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                maxLines = Int.MAX_VALUE,
-                                letterSpacing = (-0.42).sp,
-                                softWrap = true,
-                                modifier = Modifier.width(textWidth)
-                            )
-                        }
-                    }
+                            }
+                            .fillMaxWidth()
+                    )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
