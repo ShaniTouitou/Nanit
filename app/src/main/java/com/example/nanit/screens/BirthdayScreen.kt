@@ -129,8 +129,6 @@ fun BirthdayScreen(
 
     var swirlsWidth by remember { mutableStateOf(0) }
 
-    val density = LocalDensity.current
-
     state.birthdayData?.let { data ->
         val assets = state.themeAssets ?: return
         val ageMonths = calculateAgeInMonths(data.dob)
@@ -174,7 +172,7 @@ fun BirthdayScreen(
                                 start.linkTo(parent.start)
                                 end.linkTo(parent.end)
                             }
-                            .fillMaxWidth()
+                            .width(with(LocalDensity.current) { swirlsWidth.toDp() })
                     )
 
                     Row(
