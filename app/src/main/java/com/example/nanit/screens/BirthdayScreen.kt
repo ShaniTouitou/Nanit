@@ -87,7 +87,12 @@ fun BirthdayScreen(
 
     // If the server is not connected yet.
     if (state.isLoading) {
-        CircularProgressIndicator()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
         return
     }
 
