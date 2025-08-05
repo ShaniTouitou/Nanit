@@ -1,6 +1,7 @@
 package com.example.nanit.navigation
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +55,19 @@ fun AppNavigation(viewModel: BirthdayViewModel) {
 
         composable(NavRoutes.Birthday.route) {
             BirthdayScreen(state = state.value, onConnect = {}, viewModel)
+
+            BackHandler {
+                // Try to go back to the previous screen.
+                val previousScreen = navController.popBackStack()
+
+                // If there is no previous screen found, navigate to Connect screen.
+                if (!previousScreen) {
+                    navController.navigate(NavRoutes.Connect.route) {
+                        // Ensures the previous screen is cleared from the back stack.
+                        popUpTo(NavRoutes.Birthday.route) { inclusive = true }
+                    }
+                }
+            }
         }
     }
 
