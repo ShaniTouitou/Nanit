@@ -1,5 +1,6 @@
 package com.example.nanit.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.nanit.mvi.BirthdayState
 import com.example.nanit.ui.theme.BentonSans
 
 // region Constant Members
@@ -35,13 +38,15 @@ const val DISPLAY_TEXT_PORT = "Port"
 
 const val BTN_TEXT_CONNECT = "Connect"
 
+const val DISPLAY_TEXT_ERROR = "Please enter both IP and Port"
+
 // endregion
 
 /**
  * This is the server connection screen.
  */
 @Composable
-fun ConnectScreen(onConnect: (String, String) -> Unit) {
+fun ConnectScreen(onConnect: (String, String) -> Unit, state: BirthdayState) {
 
     // region Members
 
@@ -49,9 +54,18 @@ fun ConnectScreen(onConnect: (String, String) -> Unit) {
 
     var port by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+
+    val errorMessage = state.errorMsg
+
     // endregion
 
     // region UI
+
+    // Display error message if have.
+    if (!errorMessage.isNullOrEmpty()) {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+    }
 
     Column(
         modifier = Modifier
@@ -91,7 +105,15 @@ fun ConnectScreen(onConnect: (String, String) -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { onConnect(ip, port) },
+            onClick = {
+                // Verify the user entered ip and port.
+                if (ip.isBlank() || port.isBlank()) {
+                    Toast.makeText(context, "Please enter both IP and Port", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    onConnect(ip, port)
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(

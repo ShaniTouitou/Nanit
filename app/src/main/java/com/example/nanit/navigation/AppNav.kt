@@ -50,7 +50,7 @@ fun AppNavigation(viewModel: BirthdayViewModel) {
         composable(NavRoutes.Connect.route) {
             ConnectScreen(onConnect = { ip, port ->
                 viewModel.onEvent(BirthdayEvent.ConnectClicked(ip, port))
-            })
+            }, state.value)
         }
 
         composable(NavRoutes.Birthday.route) {

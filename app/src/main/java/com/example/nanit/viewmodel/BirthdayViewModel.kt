@@ -49,8 +49,17 @@ class BirthdayViewModel @Inject constructor(private val repository: BirthdayRepo
                         val data = repository.connectAndGetBirthdayData(event.ip, event.port)
                         // Getting the data after connect to the server.
                         onEvent(BirthdayEvent.OnDataReceived(data))
-                    } catch (e: Exception) {
-                        onEvent(BirthdayEvent.OnError(e.message ?: "Unknown error"))
+                    }
+                    catch (e: Exception) {
+                        val errorMessage = when (e) {
+                            is java.net.SocketTimeoutException -> "Connection timed out. Please check the IP and port."
+                            is java.net.UnknownHostException -> "Server not found. Please check the IP address."
+                            is java.io.IOException -> "Network error occurred. Please check your connection."
+                            else -> "Connection failed: ${e.message}"
+                        }
+
+                        // Show the error message in state
+                        onEvent(BirthdayEvent.OnError(errorMessage))
                     }
                 }
             }
