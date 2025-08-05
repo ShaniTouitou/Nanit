@@ -7,7 +7,7 @@ import com.example.nanit.model.BirthdayData
  */
 sealed class BirthdayEvent {
     // The connection to the server by the button.
-    data class connectClicked(val ip: String, val port: String) : BirthdayEvent()
+    data class ConnectClicked(val ip: String, val port: String) : BirthdayEvent()
 
     // Getting data from the server.
     data class OnDataReceived(val data: BirthdayData) : BirthdayEvent()

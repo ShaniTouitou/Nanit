@@ -41,7 +41,7 @@ class BirthdayViewModel @Inject constructor(private val repository: BirthdayRepo
     fun onEvent(event: BirthdayEvent) {
         when (event) {
             // Asking for network request to receive data from the server.
-            is BirthdayEvent.connectClicked -> {
+            is BirthdayEvent.ConnectClicked -> {
                 viewModelScope.launch {
                     _state.update { it.copy(isLoading = true, errorMsg = null) }
 

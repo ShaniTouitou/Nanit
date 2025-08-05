@@ -13,7 +13,7 @@ class WebSocketClient {
 
     // region Constant Members
 
-    private val BASE_URL = "ws://%s:%d/nanit"
+    private val BASE_URL = "ws://%s:%s/nanit"
 
     private val SERVER_MSG = "HappyBirthday"
 
