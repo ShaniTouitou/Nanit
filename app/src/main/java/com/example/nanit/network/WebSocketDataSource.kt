@@ -9,10 +9,12 @@ import kotlin.coroutines.resumeWithException
 /**
  *  Represent a data source responsible for managing the WebSocket connection and receiving birthday data.
  */
-class WebSocketDataSource @Inject constructor(
-    private val client: WebSocketClient
-) {
+class WebSocketDataSource @Inject constructor(private val client: WebSocketClient) {
+
+    // region Public Methods
+
     suspend fun connectAndReceive(ip: String, port: String): BirthdayData =
+        // Wait until getting the data.
         suspendCancellableCoroutine { cont ->
             client.connect(
                 ip = ip,
@@ -25,4 +27,7 @@ class WebSocketDataSource @Inject constructor(
                 }
             )
         }
+
+    // endregion
+
 }

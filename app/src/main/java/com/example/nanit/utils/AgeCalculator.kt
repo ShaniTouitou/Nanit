@@ -10,10 +10,11 @@ import java.time.temporal.ChronoUnit
 // region Public Methods
 
 /**
- * Calculate the age of the baby depend on his bod.
+ * Calculate the age of the baby depend on his date of birthday.
  */
 @RequiresApi(Build.VERSION_CODES.O)
 fun calculateAgeInMonths(dobMillis: Long): Int {
+
     val birthDate = Instant.ofEpochMilli(dobMillis)
         .atZone(ZoneId.systemDefault())
         .toLocalDate()

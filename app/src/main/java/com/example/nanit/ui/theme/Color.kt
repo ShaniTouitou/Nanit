@@ -2,7 +2,7 @@ package com.example.nanit.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// region App Colors
+// region Nanit Colors
 
 val Fox = Color(0xFFC5E8DF)
 

@@ -19,13 +19,36 @@ import com.example.nanit.viewmodel.BirthdayViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(viewModel: BirthdayViewModel) {
+
+    // region Members
+
     val navController = rememberNavController()
+
     val state = viewModel.state.collectAsState()
+
+    // endregion
+
+    // region LaunchedEffect
+
+    /**
+     * When getting data navigate to the birthday screen.
+     */
+    LaunchedEffect(state.value.birthdayData) {
+        if (state.value.birthdayData != null) {
+            navController.navigate(NavRoutes.Birthday.route) {
+                popUpTo(NavRoutes.Connect.route) { inclusive = true }
+            }
+        }
+    }
+
+    // endregion
+
+    // region NavHost
 
     NavHost(navController = navController, startDestination = NavRoutes.Connect.route) {
         composable(NavRoutes.Connect.route) {
             ConnectScreen(onConnect = { ip, port ->
-                viewModel.onEvent(BirthdayEvent.ConnectClicked(ip, port))
+                viewModel.onEvent(BirthdayEvent.connectClicked(ip, port))
             })
         }
 
@@ -34,12 +57,6 @@ fun AppNavigation(viewModel: BirthdayViewModel) {
         }
     }
 
-    // When getting data navigate to the birthday screen
-    LaunchedEffect(state.value.birthdayData) {
-        if (state.value.birthdayData != null) {
-            navController.navigate(NavRoutes.Birthday.route) {
-                popUpTo(NavRoutes.Connect.route) { inclusive = true }
-            }
-        }
-    }
+    // endregion
+
 }

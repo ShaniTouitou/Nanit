@@ -1,4 +1,4 @@
-package com.example.nanit.model
+package com.example.nanit.ui.utils
 
 import com.example.nanit.R
 

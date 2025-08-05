@@ -11,6 +11,14 @@ import okio.ByteString
  */
 class WebSocketClient {
 
+    // region Constant Members
+
+    private val BASE_URL = "ws://%s:%d/nanit"
+
+    private val SERVER_MSG = "HappyBirthday"
+
+    // endregion
+
     // region Members
 
     private var webSocket: WebSocket? = null
@@ -21,7 +29,9 @@ class WebSocketClient {
 
     fun connect(ip: String, port: String,
                 onMessage: (BirthdayData) -> Unit, onError: (Throwable) -> Unit) {
-        val url = "ws://$ip:$port/nanit"
+
+        val url = buildNanitUrl(ip, port)
+
         Log.d("WebSocketClient", "Connecting to $url")
 
         val request = Request.Builder()
@@ -33,15 +43,21 @@ class WebSocketClient {
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 Log.d("WebSocketClient", "WebSocket Opened")
-                webSocket.send("HappyBirthday")
+
+                // send message to the server to get the birthday data.
+                webSocket.send(SERVER_MSG)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.d("WebSocketClient", "Received message: $text")
+
                 try {
+                    // Initialize Moshi json parser
                     val moshi = Moshi.Builder()
                         .add(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory())
                         .build()
+
+                    // Adapter for parsing json to BirthdayData
                     val adapter = moshi.adapter(BirthdayData::class.java)
                     val data = adapter.fromJson(text)
 
@@ -63,16 +79,26 @@ class WebSocketClient {
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                 Log.d("WebSocketClient", "Closing: $code / $reason")
+
                 webSocket.close(1000, null)
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 Log.e("WebSocketClient", "Error: ${t.message}", t)
+
                 onError(t)
             }
         })
 
         Log.d("WebSocketClient", webSocket.toString())
+    }
+
+    // endregion
+
+    // region Private Methods
+
+    private fun buildNanitUrl(ip: String, port: String): String {
+        return String.format(BASE_URL, ip, port)
     }
 
     // endregion

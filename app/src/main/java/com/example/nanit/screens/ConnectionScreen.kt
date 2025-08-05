@@ -41,13 +41,12 @@ const val BTN_TEXT_CONNECT = "Connect"
  * This is the server connection screen.
  */
 @Composable
-fun ConnectScreen(
-    onConnect: (String, String) -> Unit
-) {
+fun ConnectScreen(onConnect: (String, String) -> Unit) {
 
     // region Members
 
     var ip by remember { mutableStateOf("") }
+
     var port by remember { mutableStateOf("") }
 
     // endregion

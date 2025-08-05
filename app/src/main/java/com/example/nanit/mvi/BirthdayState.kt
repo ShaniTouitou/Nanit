@@ -9,6 +9,6 @@ import com.example.nanit.model.ThemeData
 data class BirthdayState(
     val isLoading: Boolean = false,
     val birthdayData: BirthdayData? = null,
-    val themeAssets: ThemeData? = null,
-    val error: String? = null
+    val themeData: ThemeData? = null,
+    val errorMsg: String? = null
 )
